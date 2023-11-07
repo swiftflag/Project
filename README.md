@@ -7,7 +7,7 @@ that flies up and down and maybe a bit to the left and right
 enemies will spawn on the right side of the screen and approach the player while shooting
 the player's goal will be to survive as long as possible against increasing waves of enemies
 the player will also be able to pick up several randomly spawning powerups
-one of which will be an increase in the projectile size that it fires
+one of which will be an increase in the projectile size that it fires (I.E. "scaling up" the projectile)
 
 PHASE 1
 

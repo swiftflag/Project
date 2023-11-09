@@ -11,8 +11,8 @@ one of which will be an increase in the projectile size that it fires (I.E. "sca
 
 PHASE 1
 
-- [ ] The spaceship exists
-- [ ] the spaceship can move up and down with the arrow keys
+- [x] The spaceship exists
+- [x] the spaceship can move up and down with the arrow keys
 - [ ] the spaceship can fire bullets
 
 PHASE 2

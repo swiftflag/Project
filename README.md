@@ -13,7 +13,7 @@ PHASE 1
 
 - [x] The spaceship exists
 - [x] the spaceship can move up and down with the arrow keys
-- [ ] the spaceship can fire bullets
+- [x] the spaceship can fire bullets
 
 PHASE 2
 

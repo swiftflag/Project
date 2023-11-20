@@ -17,11 +17,14 @@ PHASE 1
 
 PHASE 2
 
-- [ ] create enemies
-- [ ] work on spawning mechanics of enemies
-- [ ] create movement patterns of enemies
+- [x] create enemies
+- [x] work on spawning mechanics of enemies
+- [x] create movement patterns of enemies
 
 PHASE 3
 - [ ] create background of game
 - [ ] create powerups 
 - [ ] finalize difficulty scaling and enemy point values
+
+COMMIT # 2 VIDEO:
+https://youtu.be/gQ47VT91pX4

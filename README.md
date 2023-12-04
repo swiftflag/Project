@@ -6,8 +6,6 @@ It will take place in space where the player will control a spaceship
 that flies up and down and maybe a bit to the left and right
 enemies will spawn on the right side of the screen and approach the player while shooting
 the player's goal will be to survive as long as possible against increasing waves of enemies
-the player will also be able to pick up several randomly spawning powerups
-one of which will be an increase in the projectile size that it fires (I.E. "scaling up" the projectile)
 
 PHASE 1
 
@@ -22,9 +20,7 @@ PHASE 2
 - [x] create movement patterns of enemies
 
 PHASE 3
-- [ ] create background of game
-- [ ] create powerups 
-- [ ] finalize difficulty scaling and enemy point values
-
-COMMIT # 2 VIDEO:
-https://youtu.be/gQ47VT91pX4
+- [x] create background of game
+- [x] create game over screen and end condition
+- [x] finalize difficulty scaling and enemy point value
+Youtube video link for video #3: https://youtu.be/o1qPSywyLME

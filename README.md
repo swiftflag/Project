@@ -1,12 +1,25 @@
-Jackson Singley
-jaxsing@udel.edu
+SPACE DEFENDERS
 
-So this game is going to be a classic sidescroller
-It will take place in space where the player will control a spaceship
-that flies up and down and maybe a bit to the left and right
-enemies will spawn on the right side of the screen and approach the player while shooting
-the player's goal will be to survive as long as possible against increasing waves of enemies
+A classic sidescroller videogame that takes place in space, you play as a spaceship that fights off ever-increasing waves
+of enemies in order to reach a higher and higher score!
 
+About: This game is inspired by classic games like Galaga and Space Invaders, with waves of ever-increasing enemies
+that fly towards the player, the goal of the player is to keep them from flying off-screen behind them, they have
+ten lives, so if ten spaceships fly off-screen the game is over and you are left with your score! Each spaceship is
+worth one point when destroyed!
+
+PREVIEW: https://youtu.be/o1qPSywyLME
+
+Instructions: The controls of the game are very simple, the spaceship constantly moves until it hits the top or bottom
+border of the screen, to change direction press the up or down arrows, you can also fire lasers in order to destroy
+enemy spaceships by pressing space! Be warned however, as time goes on, the amount of enemies spawned scales with time!
+Do your best to not let any spaceships get past you!
+
+Author: Jackson Singley
+        jaxsing@udel.edu
+Acknowledgement:https://designer-edu.github.io/designer/contents.html
+                for massive help with functions and figuring out designer,
+                and to Galaga and Space invaders for my inspiration
 PHASE 1
 
 - [x] The spaceship exists
@@ -23,4 +36,3 @@ PHASE 3
 - [x] create background of game
 - [x] create game over screen and end condition
 - [x] finalize difficulty scaling and enemy point value
-Youtube video link for video #3: https://youtu.be/o1qPSywyLME

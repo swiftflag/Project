@@ -8,7 +8,6 @@ that fly towards the player, the goal of the player is to keep them from flying 
 ten lives, so if ten spaceships fly off-screen the game is over and you are left with your score! Each spaceship is
 worth one point when destroyed!
 
-PREVIEW: https://youtu.be/o1qPSywyLME
 
 Instructions: The controls of the game are very simple, the spaceship constantly moves until it hits the top or bottom
 border of the screen, to change direction press the up or down arrows, you can also fire lasers in order to destroy
@@ -31,8 +30,18 @@ PHASE 2
 - [x] create enemies
 - [x] work on spawning mechanics of enemies
 - [x] create movement patterns of enemies
-
+- MILESTONE 2 VIDEO: https://youtu.be/gQ47VT91pX4
 PHASE 3
 - [x] create background of game
 - [x] create game over screen and end condition
 - [x] finalize difficulty scaling and enemy point value
+ADDITIONAL FEATURES:
+- [ ] auto-fire powerup
+- [ ] faster lasers powerup
+- [ ] collision with spaceship also loses lives
+- [ ] spaceship does not always move, only when keys are pressed
+- [ ] homing lasers power-up
+- [ ] planet earth in the background
+- [ ] added player 2 possibility
+- [x] spaceship explodes on game loss 
+- PREVIEW: https://youtu.be/o1qPSywyLME

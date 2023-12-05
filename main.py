@@ -51,7 +51,7 @@ def destroy_stars_on_exit(world: World):
         else:
             destroy(star)
     world.stars = stars_kept
-spawn_rate = 100
+spawn_rate = 10
 def create_enemies(world: World) -> DesignerObject:
     world.spawn_timer += 1
     global spawn_rate
@@ -134,7 +134,7 @@ def control_spaceship_movement(world:World, key:str):
         world.spaceship_speed = -world.spaceship_speed
     elif key == "down" and world.spaceship_speed < 0:
         world.spaceship_speed = -world.spaceship_speed
-def spaceship_bullet_collision(world: World):
+def enemy_bullet_collision(world: World):
     #makes it so enemies and bullets collide and destroy each other
     #also increases score and updates the text counter when that happens
     destroyed_enemies = []
@@ -162,8 +162,11 @@ def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list
 def Game_Over(world: World):
     if world.lives <= 0:
         text("red", "GAME OVER", 50, get_width() / 2, get_height()/2)
+        explosion = emoji("fire")
+        explosion.scale += 1
+        explosion.y = world.spaceship.y - 10
+        explosion.x = world.spaceship.x
         return True
-
 when('starting', create_world)
 when('updating', create_enemies)
 when('updating', create_stars)
@@ -174,7 +177,7 @@ when('updating', move_enemies)
 when('updating', move_bullets)
 when('updating', destroy_enemies_on_exit)
 when('updating', destroy_bullets_on_exit)
-when('updating', spaceship_bullet_collision)
+when('updating', enemy_bullet_collision)
 when('typing', control_spaceship_movement)
 when('typing', create_bullets)
 when(Game_Over, pause)

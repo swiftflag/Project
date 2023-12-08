@@ -8,19 +8,23 @@ set_window_layers(['stars', 'planet','bullets','powerups','enemies','spaceship']
 class Enemy_Movement:
     movement_angle: int
     rotate_up: int
-
 class Spaceship(image):
     speed: int
     is_moving_up: bool
     is_moving_down: bool
+class Bullet(rectangle):
+    speed: int
+class Enemy(emoji):
+    speed:int
+class Powerup(image):
+    speed: int
+
 
 @dataclass
 class World:
     spaceship: Spaceship
-    bullet_speed: int
-    bullets: list[DesignerObject]
-    enemies: list[DesignerObject]
-    enemy_speed: int
+    bullets: list[Bullet]
+    enemies: list[Enemy]
     spawn_timer: int
     enemy_movement_angles: list[Enemy_Movement]
     stars: list[DesignerObject]
@@ -30,13 +34,11 @@ class World:
     lives: int
     lives_counter: DesignerObject
     Earth: DesignerObject
-    powerups: list[DesignerObject]
-    powerup_speed: int
+    powerups: list[Powerup]
     powerup_spawn_rate: int
 
-
 def create_world() -> World:
-    return World(prepare_spaceship(), 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
+    return World(prepare_spaceship(),[],[],135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 500)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
@@ -82,7 +84,7 @@ def create_enemies(world: World):
         create_one_enemy(world)
 
 def create_one_enemy(world:World):
-    enemy = emoji("Flying Saucer")
+    enemy = Enemy('Flying Saucer', speed = 5)
     enemy.x = get_width()
     enemy.y = randint(0, get_height())
     world.enemies.append(enemy)
@@ -116,23 +118,22 @@ def change_angle(enemy_num: int, world: World):
 def move_enemies(world: World):
     #this moves the enemies but also caps their height so they cant go off-screen
     for enemy_num, enemy in enumerate(world.enemies):
-        move_forward(enemy, world.enemy_speed, (world.enemy_movement_angles[enemy_num].movement_angle))
+        move_forward(enemy, enemy.speed, (world.enemy_movement_angles[enemy_num].movement_angle))
         change_angle(enemy_num, world)
         if enemy.y < 0:
             enemy.y = 0
         elif enemy.y > get_height():
             enemy.y = get_height()
 
-def create_bullets(world: World, key: str) -> DesignerObject:
+def create_bullets(world: World, key: str):
     if key == 'space':
-        bullet = rectangle("red", 20, 5, world.spaceship.x + 20, world.spaceship.y)
+        bullet = Bullet("red", 20, 5, world.spaceship.x + 20, world.spaceship.y,speed = 15)
         bullet.layer = 'bullets'
         world.bullets.append(bullet)
-        return bullet
 
 def move_bullets(world: World):
     for bullet in world.bullets:
-        bullet.x += world.bullet_speed
+        bullet.x += bullet.speed
 def destroy_bullets_on_exit(world: World):
     #destroys bullets when they hit the edge of the screen
     bullets_kept = []
@@ -195,10 +196,10 @@ def create_powerup(world: World):
         create_one_powerup(world)
 def move_powerups(world: World):
     for powerup in world.powerups:
-        move_forward(powerup, -world.powerup_speed)
+        move_forward(powerup, -powerup.speed)
 
 def create_one_powerup(world:World):
-    powerup = image('Gear_powerup.png')
+    powerup = Powerup('Gear_powerup.png', speed = 5)
     shrink(powerup, 30)
     powerup.x = get_width()
     powerup.y = randint(0, get_height())

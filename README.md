@@ -45,4 +45,4 @@ ADDITIONAL FEATURES:
 - [ ] homing lasers power-up
 - [x] planet earth in the background
 - [ ] added player 2 possibility
-- [x] spaceship explodes on game loss 
+- [x] spaceship explodes on game loss

@@ -36,21 +36,22 @@ class World:
 
 
 def create_world() -> World:
-    return World(Spaceship('Space_fighter.png',spaceship_speed = 10, spaceship_is_moving_up = False, spaceship_is_moving_down = False), 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
+    return World(prepare_spaceship(), 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
     earth.x = -150
     earth.layer = 'planet'
     return earth
-def prepare_spaceship(world:World):
+def prepare_spaceship():
     #this function creates the spaceship and give its original position, also rotates it to get it looking right
-    spaceship = world.spaceship
+    spaceship = Spaceship('Space_fighter.png', speed = 10, is_moving_up = False, is_moving_down = False)
     turn_right(spaceship, 90)
     shrink(spaceship, 4)
     spaceship.x = 30
     spaceship.y = get_height()/2
     spaceship.layer = 'spaceship'
+    return spaceship
 def create_stars(world: World):
     star = circle("white", 4)
     star.layer = 'stars'
@@ -153,14 +154,14 @@ def move_spaceship(world: World, key: str):
 
 def start_spaceship_movement(world:World, key:str):
     if key == "up":
-        world.spaceship_is_moving_up = True
+        world.spaceship.is_moving_up = True
     elif key == "down":
-        world.spaceship_is_moving_down = True
+        world.spaceship.is_moving_down = True
 def end_spaceship_movement(world:World, key:str):
     if key == "up":
-        world.spaceship_is_moving_up = False
+        world.spaceship.is_moving_up = False
     if key == "down":
-        world.spaceship_is_moving_down = False
+        world.spaceship.is_moving_down = False
 
 def enemy_bullet_collision(world: World):
     #makes it so enemies and bullets collide and destroy each other
@@ -220,7 +221,6 @@ def Game_Over(world: World):
         explosion.x = world.spaceship.x
         return True
 when('starting', create_world)
-when('starting', prepare_spaceship)
 when('updating', create_enemies)
 when('updating', create_stars)
 when('updating', move_star)

@@ -27,10 +27,13 @@ class World:
     lives: int
     lives_counter: DesignerObject
     Earth: DesignerObject
+    powerups: list[DesignerObject]
+    powerup_speed: int
+    powerup_spawn_rate: int
 
 
 def create_world() -> World:
-    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth())
+    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
@@ -181,6 +184,32 @@ def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list
         else:
             kept_enemies.append(enemy)
     return kept_enemies
+def create_powerup(world: World) -> DesignerObject:
+    if (world.spawn_timer % 500) == 0 and world.powerup_spawn_rate > 100:
+        world.powerup_spawn_rate = world.powerup_spawn_rate - 100
+    if (world.spawn_timer % world.powerup_spawn_rate) == 0:
+        create_one_powerup(world)
+def move_powerups(world: World):
+    #this moves the enemies but also caps their height so they cant go off screen
+    for powerup in world.powerups:
+        move_forward(powerup, -world.powerup_speed)
+
+def create_one_powerup(world:World) -> DesignerObject:
+    powerup = image('Gear_powerup.png')
+    shrink(powerup, 30)
+    powerup.x = get_width()
+    powerup.y = randint(0, get_height())
+    world.powerups.append(powerup)
+def destroy_powerups_on_exit(world: World):
+    #destroys bullets when they hit the edge of the screen
+    powerups_kept = []
+    for powerup in world.powerups:
+        if powerup.x > 0:
+            powerups_kept.append(powerup)
+        else:
+            destroy(powerup)
+            print("DESTROYED BITCH")
+    world.powerups = powerups_kept
 def Game_Over(world: World):
     if world.lives <= 0:
         text("red", "GAME OVER", 50, get_width() / 2, get_height()/2)
@@ -189,7 +218,6 @@ def Game_Over(world: World):
         explosion.y = world.spaceship.y - 10
         explosion.x = world.spaceship.x
         return True
-Earth = image('Earth.png')
 when('starting', create_world)
 when('updating', create_enemies)
 when('updating', create_stars)
@@ -198,9 +226,12 @@ when('updating', destroy_stars_on_exit)
 when('updating', move_spaceship)
 when('updating', move_enemies)
 when('updating', move_bullets)
+when('updating', move_powerups)
 when('updating', destroy_enemies_on_exit)
 when('updating', destroy_bullets_on_exit)
+when('updating', destroy_powerups_on_exit)
 when('updating', enemy_bullet_collision)
+when('updating', create_powerup)
 when('typing', start_spaceship_movement)
 when('done typing', end_spaceship_movement)
 when('typing', create_bullets)

@@ -8,12 +8,15 @@ set_window_layers(['stars', 'planet','bullets','powerups','enemies','spaceship']
 class Enemy_Movement:
     movement_angle: int
     rotate_up: int
+
+class Spaceship(image):
+    speed: int
+    is_moving_up: bool
+    is_moving_down: bool
+
 @dataclass
 class World:
-    spaceship: DesignerObject
-    spaceship_speed: int
-    spaceship_is_moving_up: bool
-    spaceship_is_moving_down: bool
+    spaceship: Spaceship
     bullet_speed: int
     bullets: list[DesignerObject]
     enemies: list[DesignerObject]
@@ -33,23 +36,22 @@ class World:
 
 
 def create_world() -> World:
-    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
+    return World(Spaceship('Space_fighter.png',spaceship_speed = 10, spaceship_is_moving_up = False, spaceship_is_moving_down = False), 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 5, 500)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
     earth.x = -150
     earth.layer = 'planet'
     return earth
-def create_spaceship() -> DesignerObject:
+def prepare_spaceship(world:World):
     #this function creates the spaceship and give its original position, also rotates it to get it looking right
-    spaceship = image('Space_fighter.png')
+    spaceship = world.spaceship
     turn_right(spaceship, 90)
     shrink(spaceship, 4)
     spaceship.x = 30
     spaceship.y = get_height()/2
     spaceship.layer = 'spaceship'
-    return spaceship
-def create_stars(world: World) -> DesignerObject:
+def create_stars(world: World):
     star = circle("white", 4)
     star.layer = 'stars'
     star.x = get_width() + 20
@@ -68,7 +70,7 @@ def destroy_stars_on_exit(world: World):
             destroy(star)
     world.stars = stars_kept
 spawn_rate = 100
-def create_enemies(world: World) -> DesignerObject:
+def create_enemies(world: World):
     world.spawn_timer += 1
     global spawn_rate
     #this if statement right here makes it so that the rate of enemy spawns scales up slowly over time
@@ -78,7 +80,7 @@ def create_enemies(world: World) -> DesignerObject:
     if (world.spawn_timer % spawn_rate) == 0:
         create_one_enemy(world)
 
-def create_one_enemy(world:World) -> DesignerObject:
+def create_one_enemy(world:World):
     enemy = emoji("Flying Saucer")
     enemy.x = get_width()
     enemy.y = randint(0, get_height())
@@ -111,7 +113,7 @@ def change_angle(enemy_num: int, world: World):
     else:
         world.enemy_movement_angles[enemy_num].movement_angle -= 1
 def move_enemies(world: World):
-    #this moves the enemies but also caps their height so they cant go off screen
+    #this moves the enemies but also caps their height so they cant go off-screen
     for enemy_num, enemy in enumerate(world.enemies):
         move_forward(enemy, world.enemy_speed, (world.enemy_movement_angles[enemy_num].movement_angle))
         change_angle(enemy_num, world)
@@ -140,10 +142,10 @@ def destroy_bullets_on_exit(world: World):
             destroy(bullet)
     world.bullets = bullets_kept
 def move_spaceship(world: World, key: str):
-    if world.spaceship_is_moving_up:
-        world.spaceship.y += -world.spaceship_speed
-    if world.spaceship_is_moving_down:
-        world.spaceship.y += world.spaceship_speed
+    if world.spaceship.is_moving_up:
+        world.spaceship.y += -world.spaceship.speed
+    if world.spaceship.is_moving_down:
+        world.spaceship.y += world.spaceship.speed
     if world.spaceship.y >= get_height():
         world.spaceship.y = get_height() - 1
     elif world.spaceship.y <= 0:
@@ -159,6 +161,7 @@ def end_spaceship_movement(world:World, key:str):
         world.spaceship_is_moving_up = False
     if key == "down":
         world.spaceship_is_moving_down = False
+
 def enemy_bullet_collision(world: World):
     #makes it so enemies and bullets collide and destroy each other
     #also increases score and updates the text counter when that happens
@@ -184,17 +187,16 @@ def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list
         else:
             kept_enemies.append(enemy)
     return kept_enemies
-def create_powerup(world: World) -> DesignerObject:
+def create_powerup(world: World):
     if (world.spawn_timer % 100) == 0 and world.powerup_spawn_rate > 100:
         world.powerup_spawn_rate = world.powerup_spawn_rate - 100
     if (world.spawn_timer % world.powerup_spawn_rate) == 0:
         create_one_powerup(world)
 def move_powerups(world: World):
-    #this moves the enemies but also caps their height so they cant go off screen
     for powerup in world.powerups:
         move_forward(powerup, -world.powerup_speed)
 
-def create_one_powerup(world:World) -> DesignerObject:
+def create_one_powerup(world:World):
     powerup = image('Gear_powerup.png')
     shrink(powerup, 30)
     powerup.x = get_width()
@@ -218,6 +220,7 @@ def Game_Over(world: World):
         explosion.x = world.spaceship.x
         return True
 when('starting', create_world)
+when('starting', prepare_spaceship)
 when('updating', create_enemies)
 when('updating', create_stars)
 when('updating', move_star)

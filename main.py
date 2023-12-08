@@ -3,7 +3,7 @@ from designer import *
 from random import randint
 #make sure that the screen looks appropriately space-y
 set_window_color("black")
-set_window_layers(['stars', 'planet','bullets','enemies','spaceship'])
+set_window_layers(['stars', 'planet','bullets','powerups','enemies','spaceship'])
 @dataclass
 class Enemy_Movement:
     movement_angle: int
@@ -26,14 +26,22 @@ class World:
     score_counter: DesignerObject
     lives: int
     lives_counter: DesignerObject
+    Earth: DesignerObject
 
 
 def create_world() -> World:
-    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20))
+    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth())
+def create_earth() -> DesignerObject:
+    earth = image('Earth.png')
+    earth.y = get_height()/2
+    earth.x = -150
+    earth.layer = 'planet'
+    return earth
 def create_spaceship() -> DesignerObject:
     #this function creates the spaceship and give its original position, also rotates it to get it looking right
-    spaceship = emoji("Rocket")
-    turn_right(spaceship, 45)
+    spaceship = image('Space_fighter.png')
+    turn_right(spaceship, 90)
+    shrink(spaceship, 4)
     spaceship.x = 30
     spaceship.y = get_height()/2
     spaceship.layer = 'spaceship'
@@ -181,6 +189,7 @@ def Game_Over(world: World):
         explosion.y = world.spaceship.y - 10
         explosion.x = world.spaceship.x
         return True
+Earth = image('Earth.png')
 when('starting', create_world)
 when('updating', create_enemies)
 when('updating', create_stars)

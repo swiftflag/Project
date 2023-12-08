@@ -3,6 +3,7 @@ from designer import *
 from random import randint
 #make sure that the screen looks appropriately space-y
 set_window_color("black")
+set_window_layers(['stars', 'planet','bullets','enemies','spaceship'])
 @dataclass
 class Enemy_Movement:
     movement_angle: int
@@ -11,6 +12,8 @@ class Enemy_Movement:
 class World:
     spaceship: DesignerObject
     spaceship_speed: int
+    spaceship_is_moving_up: bool
+    spaceship_is_moving_down: bool
     bullet_speed: int
     bullets: list[DesignerObject]
     enemies: list[DesignerObject]
@@ -26,16 +29,18 @@ class World:
 
 
 def create_world() -> World:
-    return World(create_spaceship(), 10, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20))
+    return World(create_spaceship(), 10, False,False, 15, [],[], 5,135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20))
 def create_spaceship() -> DesignerObject:
     #this function creates the spaceship and give its original position, also rotates it to get it looking right
     spaceship = emoji("Rocket")
     turn_right(spaceship, 45)
     spaceship.x = 30
     spaceship.y = get_height()/2
+    spaceship.layer = 'spaceship'
     return spaceship
 def create_stars(world: World) -> DesignerObject:
     star = circle("white", 4)
+    star.layer = 'stars'
     star.x = get_width() + 20
     star.y = randint(0, get_height())
     world.stars.append(star)
@@ -51,13 +56,13 @@ def destroy_stars_on_exit(world: World):
         else:
             destroy(star)
     world.stars = stars_kept
-spawn_rate = 10
+spawn_rate = 100
 def create_enemies(world: World) -> DesignerObject:
     world.spawn_timer += 1
     global spawn_rate
     #this if statement right here makes it so that the rate of enemy spawns scales up slowly over time
     #it also caps it at a number where it is very difficult but not impossible to eliminate all enemies
-    if (world.spawn_timer % 50) == 0 and spawn_rate > 10:
+    if (world.spawn_timer % 500) == 0 and spawn_rate > 10:
         spawn_rate = spawn_rate - 10
     if (world.spawn_timer % spawn_rate) == 0:
         create_one_enemy(world)
@@ -107,6 +112,7 @@ def move_enemies(world: World):
 def create_bullets(world: World, key: str) -> DesignerObject:
     if key == 'space':
         bullet = rectangle("red", 20, 5, world.spaceship.x + 20, world.spaceship.y)
+        bullet.layer = 'bullets'
         world.bullets.append(bullet)
         return bullet
 
@@ -123,17 +129,25 @@ def destroy_bullets_on_exit(world: World):
             destroy(bullet)
     world.bullets = bullets_kept
 def move_spaceship(world: World, key: str):
+    if world.spaceship_is_moving_up:
+        world.spaceship.y += -world.spaceship_speed
+    if world.spaceship_is_moving_down:
         world.spaceship.y += world.spaceship_speed
-        if world.spaceship.y >= get_height():
-            world.spaceship.y = get_height() - 1
-        elif world.spaceship.y <= 0:
-            world.spaceship.y = 1
+    if world.spaceship.y >= get_height():
+        world.spaceship.y = get_height() - 1
+    elif world.spaceship.y <= 0:
+        world.spaceship.y = 1
 
-def control_spaceship_movement(world:World, key:str):
-    if key == "up" and world.spaceship_speed > 0:
-        world.spaceship_speed = -world.spaceship_speed
-    elif key == "down" and world.spaceship_speed < 0:
-        world.spaceship_speed = -world.spaceship_speed
+def start_spaceship_movement(world:World, key:str):
+    if key == "up":
+        world.spaceship_is_moving_up = True
+    elif key == "down":
+        world.spaceship_is_moving_down = True
+def end_spaceship_movement(world:World, key:str):
+    if key == "up":
+        world.spaceship_is_moving_up = False
+    if key == "down":
+        world.spaceship_is_moving_down = False
 def enemy_bullet_collision(world: World):
     #makes it so enemies and bullets collide and destroy each other
     #also increases score and updates the text counter when that happens
@@ -162,7 +176,7 @@ def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list
 def Game_Over(world: World):
     if world.lives <= 0:
         text("red", "GAME OVER", 50, get_width() / 2, get_height()/2)
-        explosion = emoji("fire")
+        explosion = emoji("collision_symbol")
         explosion.scale += 1
         explosion.y = world.spaceship.y - 10
         explosion.x = world.spaceship.x
@@ -178,7 +192,8 @@ when('updating', move_bullets)
 when('updating', destroy_enemies_on_exit)
 when('updating', destroy_bullets_on_exit)
 when('updating', enemy_bullet_collision)
-when('typing', control_spaceship_movement)
+when('typing', start_spaceship_movement)
+when('done typing', end_spaceship_movement)
 when('typing', create_bullets)
 when(Game_Over, pause)
 start()

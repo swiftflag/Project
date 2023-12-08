@@ -185,7 +185,7 @@ def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list
             kept_enemies.append(enemy)
     return kept_enemies
 def create_powerup(world: World) -> DesignerObject:
-    if (world.spawn_timer % 500) == 0 and world.powerup_spawn_rate > 100:
+    if (world.spawn_timer % 100) == 0 and world.powerup_spawn_rate > 100:
         world.powerup_spawn_rate = world.powerup_spawn_rate - 100
     if (world.spawn_timer % world.powerup_spawn_rate) == 0:
         create_one_powerup(world)
@@ -204,11 +204,10 @@ def destroy_powerups_on_exit(world: World):
     #destroys bullets when they hit the edge of the screen
     powerups_kept = []
     for powerup in world.powerups:
-        if powerup.x > 0:
+        if powerup.x > -50:
             powerups_kept.append(powerup)
         else:
             destroy(powerup)
-            print("DESTROYED BITCH")
     world.powerups = powerups_kept
 def Game_Over(world: World):
     if world.lives <= 0:

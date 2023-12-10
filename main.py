@@ -16,6 +16,7 @@ class Bullet(rectangle):
     speed: int
 class Enemy(emoji):
     speed:int
+    move_class: Enemy_Movement
 class Powerup(image):
     speed: int
 
@@ -26,7 +27,6 @@ class World:
     bullets: list[Bullet]
     enemies: list[Enemy]
     spawn_timer: int
-    enemy_movement_angles: list[Enemy_Movement]
     stars: list[DesignerObject]
     star_speed: int
     score: int
@@ -38,7 +38,7 @@ class World:
     powerup_spawn_rate: int
 
 def create_world() -> World:
-    return World(prepare_spaceship(),[],[],135, [], [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 500)
+    return World(prepare_spaceship(),[],[],135, [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 500)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
@@ -84,11 +84,11 @@ def create_enemies(world: World):
         create_one_enemy(world)
 
 def create_one_enemy(world:World):
-    enemy = Enemy('Flying Saucer', speed = 5)
+    enemy = Enemy('Flying Saucer', speed = 5, move_class = Enemy_Movement(randint(135, 225), randint(0, 1)))
     enemy.x = get_width()
     enemy.y = randint(0, get_height())
     world.enemies.append(enemy)
-    world.enemy_movement_angles.append(Enemy_Movement(randint(135, 225), randint(0, 1)))
+
 
 def destroy_enemies_on_exit(world: World):
     # destroys the  in enemies in world.enemies that are a bit beyond the left border of the screen
@@ -102,24 +102,24 @@ def destroy_enemies_on_exit(world: World):
             world.lives_counter.text = "Lives: " + str(world.lives)
 
     world.enemies = enemies_kept
-def change_angle(enemy_num: int, world: World):
+def change_angle(enemy: Enemy, world: World):
     #this is a wild one for sure, but essentially it makes the spaceships move in wavy patterns
     #by rotating their direction of movement
-    if world.enemy_movement_angles[enemy_num].movement_angle < 135:
-        world.enemy_movement_angles[enemy_num].movement_angle = 135
-        world.enemy_movement_angles[enemy_num].rotate_up = 1
-    elif world.enemy_movement_angles[enemy_num].movement_angle > 225:
-        world.enemy_movement_angles[enemy_num].movement_angle = 225
-        world.enemy_movement_angles[enemy_num].rotate_up = 0
-    if world.enemy_movement_angles[enemy_num].rotate_up == 1:
-        world.enemy_movement_angles[enemy_num].movement_angle += 1
+    if enemy.move_class.movement_angle < 135:
+        enemy.move_class.movement_angle = 135
+        enemy.move_class.rotate_up = 1
+    elif enemy.move_class.movement_angle > 225:
+        enemy.move_class.movement_angle = 225
+        enemy.move_class.rotate_up = 0
+    if enemy.move_class.rotate_up == 1:
+        enemy.move_class.movement_angle += 1
     else:
-        world.enemy_movement_angles[enemy_num].movement_angle -= 1
+        enemy.move_class.movement_angle -= 1
 def move_enemies(world: World):
     #this moves the enemies but also caps their height so they cant go off-screen
-    for enemy_num, enemy in enumerate(world.enemies):
-        move_forward(enemy, enemy.speed, (world.enemy_movement_angles[enemy_num].movement_angle))
-        change_angle(enemy_num, world)
+    for enemy in world.enemies:
+        move_forward(enemy, enemy.speed, enemy.move_class.movement_angle)
+        change_angle(enemy, world)
         if enemy.y < 0:
             enemy.y = 0
         elif enemy.y > get_height():

@@ -19,6 +19,7 @@ class Enemy(emoji):
     move_class: Enemy_Movement
 class Powerup(image):
     speed: int
+    powerup_type: int
 
 
 @dataclass
@@ -36,9 +37,10 @@ class World:
     Earth: DesignerObject
     powerups: list[Powerup]
     powerup_spawn_rate: int
+    powerup_timer: int
 
 def create_world() -> World:
-    return World(prepare_spaceship(),[],[],135, [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 500)
+    return World(prepare_spaceship(),[],[],135, [], 20,0, text("red","Score: 0", 20,get_width()/2, 20),10,text("green","Lives: 10", 20,(get_width()/2) + 100, 20),create_earth(),[], 500, -1)
 def create_earth() -> DesignerObject:
     earth = image('Earth.png')
     earth.y = get_height()/2
@@ -125,12 +127,13 @@ def move_enemies(world: World):
         elif enemy.y > get_height():
             enemy.y = get_height()
 
-def create_bullets(world: World, key: str):
+def create_bullets_on_space(world: World, key: str):
     if key == 'space':
-        bullet = Bullet("red", 20, 5, world.spaceship.x + 20, world.spaceship.y,speed = 15)
-        bullet.layer = 'bullets'
-        world.bullets.append(bullet)
-
+        create_single_bullet(world)
+def create_single_bullet(world: World):
+    bullet = Bullet("red", 20, 5, world.spaceship.x + 20, world.spaceship.y, speed=15)
+    bullet.layer = 'bullets'
+    world.bullets.append(bullet)
 def move_bullets(world: World):
     for bullet in world.bullets:
         bullet.x += bullet.speed
@@ -179,27 +182,27 @@ def enemy_bullet_collision(world: World):
                 world.score_counter.text = "Score: " + str(world.score)
     world.bullets = filter_from(world.bullets, destroyed_bullets)
     world.enemies = filter_from(world.enemies, destroyed_enemies)
-def filter_from(old_enemy_list: list[DesignerObject], destroyed_enemy_list: list[DesignerObject]) -> list[DesignerObject]:
+def filter_from(old_list: list[DesignerObject], removal_list: list[DesignerObject]) -> list[DesignerObject]:
     #this is a helper function that sorts through a list of designer objects, destroys any that match
     #those that have collided, appends a new list with those that have not collided and returns that new list
-    kept_enemies = []
-    for enemy in old_enemy_list:
-        if enemy in destroyed_enemy_list:
-            destroy(enemy)
+    kept_objects = []
+    for object in old_list:
+        if object in removal_list:
+            destroy(object)
         else:
-            kept_enemies.append(enemy)
-    return kept_enemies
+            kept_objects.append(object)
+    return kept_objects
 def create_powerup(world: World):
-    if (world.spawn_timer % 100) == 0 and world.powerup_spawn_rate > 100:
+    if (world.spawn_timer % 150) == 0 and world.powerup_spawn_rate > 100:
         world.powerup_spawn_rate = world.powerup_spawn_rate - 100
     if (world.spawn_timer % world.powerup_spawn_rate) == 0:
         create_one_powerup(world)
 def move_powerups(world: World):
     for powerup in world.powerups:
-        move_forward(powerup, -powerup.speed)
+        move_forward(powerup, powerup.speed)
 
 def create_one_powerup(world:World):
-    powerup = Powerup('Gear_powerup.png', speed = 5)
+    powerup = Powerup('Gear_powerup.png', speed = -5, powerup_type = 0)
     shrink(powerup, 30)
     powerup.x = get_width()
     powerup.y = randint(0, get_height())
@@ -213,6 +216,18 @@ def destroy_powerups_on_exit(world: World):
         else:
             destroy(powerup)
     world.powerups = powerups_kept
+def player_powerup_collision(world: World):
+    destroyed_powerups = []
+    for powerup in world.powerups:
+        if colliding(world.spaceship, powerup):
+            destroyed_powerups.append(powerup)
+            world.powerup_timer = 150
+    world.powerups = filter_from(world.powerups, destroyed_powerups)
+def powerup_handler(world:World):
+    world.powerup_timer -= 1
+    if world.powerup_timer > 0:
+        create_single_bullet(world)
+
 def Game_Over(world: World):
     if world.lives <= 0:
         text("red", "GAME OVER", 50, get_width() / 2, get_height()/2)
@@ -234,9 +249,11 @@ when('updating', destroy_enemies_on_exit)
 when('updating', destroy_bullets_on_exit)
 when('updating', destroy_powerups_on_exit)
 when('updating', enemy_bullet_collision)
+when('updating', player_powerup_collision)
 when('updating', create_powerup)
+when('updating', powerup_handler)
 when('typing', start_spaceship_movement)
 when('done typing', end_spaceship_movement)
-when('typing', create_bullets)
+when('typing', create_bullets_on_space)
 when(Game_Over, pause)
 start()

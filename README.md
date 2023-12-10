@@ -39,10 +39,8 @@ PHASE 3
 ADDITIONAL FEATURES:
 - [x] all objects on their own layers for asthetics
 - [x] prettier spaceship
-- [ ] auto-fire powerup
-- [ ] faster lasers powerup
+- [x] auto-fire powerup
 - [x] spaceship does not always move, only when keys are pressed
 - [ ] homing lasers power-up
 - [x] planet earth in the background
-- [ ] added player 2 possibility
 - [x] spaceship explodes on game loss
